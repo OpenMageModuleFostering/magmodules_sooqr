@@ -2,7 +2,7 @@
 <layout version="0.1.0">
     <default>
         <reference name="header">
-            <block type="sooqr/search" name="top.search" as="topSearch" template="magmodules/sooqr/form.mini.phtml"/>
+            <block type="sooqr/search" name="top.search" as="topSearch" />
         </reference>
     </default>
 </layout>

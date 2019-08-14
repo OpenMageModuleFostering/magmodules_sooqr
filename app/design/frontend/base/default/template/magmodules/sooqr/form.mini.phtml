@@ -26,29 +26,20 @@
         <input id="search" type="search" name="<?php echo $catalogSearchHelper->getQueryParamName() ?>" value="<?php echo $catalogSearchHelper->getEscapedQueryText() ?>" class="input-text required-entry" placeholder="<?php echo $this->quoteEscape($this->__('Search entire store here...')) ?>" />
         <button type="submit" title="<?php echo $this->quoteEscape($this->__('Search')) ?>" class="button search-button"><span><span><?php echo $this->__('Search') ?></span></span></button>
     </div>
-	<?php if($this->isEnabled()) : ?>
-		<script type="text/javascript">
-			var _wssq = _wssq || [];
-			_wssq.push(['_load', { 'suggest' : <?php echo json_encode($this->getSooqrOptions()) ?>}]);
-			_wssq.push(['suggest._setPosition', 'screen-middle']);
-			_wssq.push(['suggest._setLocale', '<?php echo $this->getSooqrLanguage() ?>']);
-			_wssq.push(['suggest._setFixedFilters', { 'magento_store' : '<?php echo Mage::app()->getStore()->getCode(); ?>' }]);
-			<?php if (!$this->isTrackingEnabled()) { ?>
-			_wssq.push(['suggest._disableTracking']);
-			<?php } ?>
-			<?php echo $this->getSooqrJavascript() ?>
-			(function() {
-				var ws = document.createElement('script'); ws.type = 'text/javascript'; ws.async = true;
-				ws.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<?php echo $this->getSooqrScriptUri() ?>';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ws, s);
-			})();
-		</script>   
-	<?php else: ?>
-		<script type="text/javascript">
-		//<![CDATA[
-			var searchForm = new Varien.searchForm('search_mini_form', 'search', '');
-			searchForm.initAutocomplete('<?php echo $catalogSearchHelper->getSuggestUrl() ?>', 'search_autocomplete');
-		//]]>
-	    </script>
-	<?php endif; ?>  
+	<script type="text/javascript">
+		var _wssq = _wssq || [];
+		_wssq.push(['_load', { 'suggest' : <?php echo json_encode($this->getSooqrOptions()) ?>}]);
+		_wssq.push(['suggest._setPosition', 'screen-middle']);
+		_wssq.push(['suggest._setLocale', '<?php echo $this->getSooqrLanguage() ?>']);
+		_wssq.push(['suggest._setFixedFilters', { 'magento_store' : '<?php echo Mage::app()->getStore()->getCode(); ?>' }]);
+		<?php if (!$this->isTrackingEnabled()) { ?>
+		_wssq.push(['suggest._disableTracking']);
+		<?php } ?>
+		<?php echo $this->getSooqrJavascript() ?>
+		(function() {
+			var ws = document.createElement('script'); ws.type = 'text/javascript'; ws.async = true;
+			ws.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<?php echo $this->getSooqrScriptUri() ?>';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ws, s);
+		})();
+	</script>   
 </form>

@@ -19,7 +19,7 @@
 <config>
 	<modules>
 		<Magmodules_Sooqr>
-			<version>1.1.4</version>
+			<version>1.1.5</version>
 		</Magmodules_Sooqr>
 	</modules>
 	<global>
@@ -124,9 +124,8 @@
 	<crontab>
         <jobs>
 			<sooqr_generate>
-                <schedule><config_path>sooqr/generate/cron_schedule</config_path></schedule>
                 <run><model>sooqr/observer::scheduledGenerateSooqr</model></run>
-			</sooqr_generate>
+			</sooqr_generate>				
         </jobs>
-    </crontab>
+    </crontab>	
 </config>

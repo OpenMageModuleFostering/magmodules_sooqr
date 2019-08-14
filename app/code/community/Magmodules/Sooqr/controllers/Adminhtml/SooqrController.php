@@ -19,33 +19,29 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 
 	public function generateFeedAction($store_id = '') 
 	{	
-		if(Mage::getStoreConfig('sooqr_connect/general/enabled')) {
-			$store_id = $this->getRequest()->getParam('store_id');
-			if(!empty($store_id)) {
-				$time_start = microtime(true);
-				$appEmulation = Mage::getSingleton('core/app_emulation');
-				$initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($store_id);
-				if($result = Mage::getModel('sooqr/sooqr')->generateFeed($store_id, '', $time_start)) {
-					$html = '<a href="' . $result['url'] . '" target="_blank">' . $result['url'] .'</a><br/><small>Date: ' . $result['date'] . ' (manual) - Products: ' . $result['qty'] . ' - Time: ' . number_format((microtime(true) - $time_start), 4) . '</small>';
-					$config = new Mage_Core_Model_Config();
-					$config->saveConfig('sooqr_connect/generate/feed_result', $html, 'stores', $store_id);
-					Mage::app()->getCacheInstance()->cleanType('config');
-					Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('sooqr')->__('Generated feed with %s products. %s', $result['qty'], '<a  style="float:right;" href="' . $this->getUrl('*/sooqr/download/store_id/' . $store_id) . '">Download XML</a>'));
-					$limit = Mage::getStoreConfig('sooqr_connect/generate/limit', $store_id);
-					if($limit > 0) {
-						Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('sooqr')->__('Note, in the feed generate configuration tab you have enabled the product limit of %s.', $limit));				
-					}
-				} else {
-					$config = new Mage_Core_Model_Config();
-					$config->saveConfig('sooqr_connect/generate/feed_result', '', 'stores', $store_id);
-					Mage::getSingleton('adminhtml/session')->addError(Mage::helper('sooqr')->__('No products found, make sure your filters are configured with existing values.'));
-					Mage::app()->getCacheInstance()->cleanType('config');
+		$store_id = $this->getRequest()->getParam('store_id');
+		if(!empty($store_id)) {
+			$time_start = microtime(true);
+			$appEmulation = Mage::getSingleton('core/app_emulation');
+			$initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($store_id);
+			if($result = Mage::getModel('sooqr/sooqr')->generateFeed($store_id, '', $time_start)) {
+				$html = '<a href="' . $result['url'] . '" target="_blank">' . $result['url'] .'</a><br/><small>Date: ' . $result['date'] . ' (manual) - Products: ' . $result['qty'] . ' - Time: ' . number_format((microtime(true) - $time_start), 4) . '</small>';
+				$config = new Mage_Core_Model_Config();
+				$config->saveConfig('sooqr_connect/generate/feed_result', $html, 'stores', $store_id);
+				Mage::app()->getCacheInstance()->cleanType('config');
+				Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('sooqr')->__('Generated feed with %s products. %s', $result['qty'], '<a  style="float:right;" href="' . $this->getUrl('*/sooqr/download/store_id/' . $store_id) . '">Download XML</a>'));
+				$limit = Mage::getStoreConfig('sooqr_connect/generate/limit', $store_id);
+				if($limit > 0) {
+					Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('sooqr')->__('Note, in the feed generate configuration tab you have enabled the product limit of %s.', $limit));				
 				}
-				$appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);			
-			}	
-		} else {
-			Mage::getSingleton('adminhtml/session')->addError(Mage::helper('sooqr')->__('Please enable the extension before generating the xml'));		
-		}    	
+			} else {
+				$config = new Mage_Core_Model_Config();
+				$config->saveConfig('sooqr_connect/generate/feed_result', '', 'stores', $store_id);
+				Mage::getSingleton('adminhtml/session')->addError(Mage::helper('sooqr')->__('No products found, make sure your filters are configured with existing values.'));
+				Mage::app()->getCacheInstance()->cleanType('config');
+			}
+			$appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);			
+		}	
         $this->_redirect('adminhtml/system_config/edit/section/sooqr_connect');
     } 
 
@@ -77,7 +73,7 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 			}
 		}
 		Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('sooqr')->__('Attributes added to Flat Catalog, please reindex Product Flat Data.'));
-        $this->_redirect('adminhtml/system_config/edit/section/sooqr');
+        $this->_redirect('adminhtml/system_config/edit/section/sooqr_connect');
 	}
 
 	protected function _isAllowed() 

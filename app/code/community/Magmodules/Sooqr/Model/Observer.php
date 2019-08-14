@@ -22,8 +22,8 @@ class Magmodules_Sooqr_Model_Observer {
         $enabled = Mage::getStoreConfig('sooqr_connect/general/enabled');
     	$cron = Mage::getStoreConfig('sooqr_connect/generate/cron');
     	$next_store = Mage::getStoreConfig('sooqr_connect/generate/cron_next');
-		if($enabled && $cron) {
-			$storeIds = Mage::helper('sooqr')->getStoreIds('sooqr/generate/enabled'); 		
+		$storeIds = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
+		if($enabled && $cron && (count($storeIds) > 0)) {
 			if(empty($next_store) || ($next_store >= count($storeIds))) { 
 				$next_store = 0; 
 			}		
@@ -31,7 +31,7 @@ class Magmodules_Sooqr_Model_Observer {
 			$time_start = microtime(true);
 			$appEmulation = Mage::getSingleton('core/app_emulation');
 			$initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($store_id);
-			if($result = Mage::getModel('sooqr/sooqr')->generateFeed($store_id)) {
+			if($result = Mage::getModel('sooqr/sooqr')->generateFeed($store_id, '', $time_start)) {
 				$html = '<a href="' . $result['url'] . '" target="_blank">' . $result['url'] .'</a><br/><small>Date: ' . $result['date'] . ' (cron) - Products: ' . $result['qty'] . ' - Time: ' . number_format((microtime(true) - $time_start), 4) . '</small>';
 				$config = new Mage_Core_Model_Config();
 				$config->saveConfig('sooqr_connect/generate/feed_result', $html, 'stores', $store_id);

@@ -72,8 +72,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </enabled>  
 						<api_heading translate="label">
                             <label>API Details</label>
@@ -91,6 +91,7 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 							<tooltip>You can find your Sooqr Account ID in your Sooqr account, you can find the link in the information box at the top of this page.</tooltip>
+							<comment>It should look like SQ-12345-1.</comment>
 						</account_id>	
 						<api_key translate="label">
 							<label>Sooqr API Key</label>
@@ -571,14 +572,14 @@
 							<depends><overwrite>1</overwrite></depends>
 							<comment><![CDATA[This overwrites the maximum time in seconds a script is allowed to run before it is terminated by the parser, eg: 300 (for 5 minutes).]]></comment>															
 						</max_execution_time> 						
-						<mpn_heading translate="label">
+						<cron_heading translate="label">
                             <label>Cron</label>
                             <frontend_model>sooqr/adminhtml_system_config_form_field_heading</frontend_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-						</mpn_heading>   
+						</cron_heading>   
 						<cron translate="label">
                             <label>Enabled</label>
                             <frontend_type>select</frontend_type>

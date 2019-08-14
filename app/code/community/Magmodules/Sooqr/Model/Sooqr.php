@@ -238,11 +238,16 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 
 	protected function getAssocId($data) 
 	{			
+		$assoc_id = array();
 		if(empty($data['assoc_id'])) {
-			$assoc_id = array();
 			$assoc_id['assoc_id'] = $data['id'];
-			return $assoc_id;
 		}	
+		if($data['product_object_type'] != 'simple') {
+			$assoc_id['is_parent'] = '1';
+		} else {
+			$assoc_id['is_parent'] = '0';		
+		}
+		return $assoc_id;		
 	}
 		
 	protected function getCategoryData($product_data, $config) 
@@ -294,6 +299,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$header['url'] = $config['website_url'];
 		$header['products_total'] = $count;
 		$header['products_limit'] = $config['limit'];
+		$header['date_created'] = Mage::getModel('core/date')->date('Y-m-d H:i:s');
 		$header['processing_time'] = number_format((microtime(true) - $time_start), 4);
 		return $header;
 	}

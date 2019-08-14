@@ -17,9 +17,19 @@
  
 class Magmodules_Sooqr_Block_Search extends Mage_Core_Block_Template {
 
+    protected function _construct() 
+    {   
+		if($this->isEnabled()) {
+			$this->setTemplate('magmodules/sooqr/form.mini.phtml');
+		} else {
+			$this->setTemplate('catalogsearch/form.mini.phtml');		
+		}	
+		parent::_construct();            
+    }
+
 	public function isEnabled() 
 	{
-		$enabled = Mage::getStoreConfig('sooqr_connect/general/enabled');
+		$enabled = Mage::getStoreConfig('sooqr_connect/general/enabled', 0);
 		$frontend_enabled = Mage::getStoreConfig('sooqr_connect/general/frontend_enabled');
 		$account_id = Mage::getStoreConfig('sooqr_connect/general/account_id');
 		$api_key = Mage::getStoreConfig('sooqr_connect/general/api_key');
