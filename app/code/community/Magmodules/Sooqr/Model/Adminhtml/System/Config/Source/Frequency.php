@@ -17,20 +17,18 @@
 
 class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Frequency {
 
-    protected static $_options;
-
     public function toOptionArray() 
     {
-        if(!self::$_options) {
-            self::$_options = array(
-                array('label' => Mage::helper('adminhtml')->__('Daily'), 'value' => '0'),
-                array('label' => Mage::helper('adminhtml')->__('Every 6 hours'), 'value' => '6'),
-                array('label' => Mage::helper('adminhtml')->__('Every 4 hours'), 'value' => '4'),
-                array('label' => Mage::helper('adminhtml')->__('Every 2 hours'), 'value' => '2'),
-                array('label' => Mage::helper('adminhtml')->__('Every hour'), 'value' => '1'),
-            );
-        }
-        return self::$_options;
+		$frequency = array();
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Daily'), 'value' => '0');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every 6 hours'), 'value' => '6');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every 4 hours'), 'value' => '4');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every 2 hours'), 'value' => '2');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every hour'), 'value' => '1');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every 30 minutes'), 'value' => '30');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Every 15 minutes'), 'value' => '15');
+		$frequency[] = array('label' => Mage::helper('adminhtml')->__('Custom'), 'value' => 'custom_expr');
+		return $frequency;
     }
 
 }

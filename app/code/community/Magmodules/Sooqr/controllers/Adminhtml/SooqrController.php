@@ -28,7 +28,6 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 				$html = '<a href="' . $result['url'] . '" target="_blank">' . $result['url'] .'</a><br/><small>Date: ' . $result['date'] . ' (manual) - Products: ' . $result['qty'] . ' - Time: ' . number_format((microtime(true) - $time_start), 4) . '</small>';
 				$config = new Mage_Core_Model_Config();
 				$config->saveConfig('sooqr_connect/generate/feed_result', $html, 'stores', $store_id);
-				Mage::app()->getCacheInstance()->cleanType('config');
 				Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('sooqr')->__('Generated feed with %s products. %s', $result['qty'], '<a  style="float:right;" href="' . $this->getUrl('*/sooqr/download/store_id/' . $store_id) . '">Download XML</a>'));
 				$limit = Mage::getStoreConfig('sooqr_connect/generate/limit', $store_id);
 				if($limit > 0) {
@@ -38,7 +37,6 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 				$config = new Mage_Core_Model_Config();
 				$config->saveConfig('sooqr_connect/generate/feed_result', '', 'stores', $store_id);
 				Mage::getSingleton('adminhtml/session')->addError(Mage::helper('sooqr')->__('No products found, make sure your filters are configured with existing values.'));
-				Mage::app()->getCacheInstance()->cleanType('config');
 			}
 			$appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);			
 		}	

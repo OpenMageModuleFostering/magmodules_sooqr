@@ -195,12 +195,20 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
         }
 	}  
 	   
-	protected function getPrices($data, $currency, $config, $conf_prices, $id) 
+	protected function getPrices($data, $currency, $config, $conf_prices, $product) 
 	{			
 		$prices = array();
+		$id = $product->getEntityId();	
 		$prices['currency'] = $currency;
 		if(!empty($conf_prices[$id])) {
-			$prices['price'] = $conf_prices[$id];	
+			$conf_price = Mage::helper('tax')->getPrice($product, $conf_prices[$id], true);
+			$conf_price_reg = Mage::helper('tax')->getPrice($product, $conf_prices[$id . '_reg'], true);
+			if($conf_price_reg > $conf_price) {
+				$prices['price'] = $conf_price;
+				$prices['normal_price'] = $conf_price_reg;
+			} else {
+				$prices['price'] = $conf_price;
+			}
 		} else {
 			if(!empty($config['currency_data'])) {
 				foreach($config['currency_data'] as $key => $value) {		
@@ -294,7 +302,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		if($_category_data = $this->getCategoryData($product_data, $config)) {
 			$_extra = array_merge($_extra, $_category_data);
 		}
-		if($_prices = $this->getPrices($product_data['price'], $config['currency'], $config, $prices, $product->getEntityId())) {
+		if($_prices = $this->getPrices($product_data['price'], $config['currency'], $config, $prices, $product)) {
 			$_extra = array_merge($_extra, $_prices);
 		}
 		if($_assoc_id = $this->getAssocId($product_data)) {

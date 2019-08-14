@@ -457,10 +457,7 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 			$price_data['sales_price'] = number_format(($sales_price * $price_markup), 2, '.', '') . $currency;
 		}
 		
-		if($price_data['final_price_clean'] > 0.01) {	
-			return $price_data;
-		}
-		
+		return $price_data;		
 	}
 	
 	public function getPriceMarkup($config) 
@@ -677,24 +674,22 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getTypePrices($config, $products) 
 	{
 		$type_prices = array();
-		if(!empty($config['conf_enabled'])) {
-			if(!empty($config['hide_currency'])) {
-				$currency = '';
-			} else {
-				$currency = ' ' . $config['currency'];
-			}			
+		if(!empty($config['conf_enabled'])) {	
 			foreach($products as $product) {
 				if($product->getTypeId() == 'configurable') {
 					$attributes = $product->getTypeInstance(true)->getConfigurableAttributes($product);
 					$att_prices = array();
 					$base_price = $product->getFinalPrice();
+					$base_price_reg = $product->getPrice();
 					foreach ($attributes as $attribute){
 						$prices = $attribute->getPrices();
 						foreach ($prices as $price){
 							if ($price['is_percent']) { 
 								$att_prices[$price['value_index']] = (float)(($price['pricing_value'] * $base_price / 100) * $config['markup']);
+								$att_prices[$price['value_index'] . '_reg'] = (float)(($price['pricing_value'] * $base_price_reg / 100) * $config['markup']);
 							} else {
 								$att_prices[$price['value_index']] = (float)($price['pricing_value'] * $config['markup']);
+								$att_prices[$price['value_index'] . '_reg'] = (float)($price['pricing_value'] * $config['markup']);
 							}
 						}
 					}
@@ -702,20 +697,23 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 					$simple_prices = array();	
 					foreach($simple as $sProduct) {
 						$total_price = $base_price;
+						$total_price_reg = $base_price_reg;
 						foreach($attributes as $attribute) {
 							$value = $sProduct->getData($attribute->getProductAttribute()->getAttributeCode());
 							if(isset($att_prices[$value])) {
 								$total_price += $att_prices[$value];
+								$total_price_reg += $att_prices[$value . '_reg'];
 							}
 						}
-						$type_prices[$sProduct->getEntityId()] = number_format(($total_price * $config['markup']), 2, '.', '') . $currency;
+						$type_prices[$sProduct->getEntityId()] = number_format(($total_price * $config['markup']), 2, '.', '');
+						$type_prices[$sProduct->getEntityId() . '_reg'] = number_format(($total_price_reg * $config['markup']), 2, '.', '');
 					}
 				}
 			}
 		}
 		return $type_prices;
 	}
-
+	
 	public function checkOldVersion($dir) 
 	{
 		if($dir) {
@@ -765,10 +763,21 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 	{
 		$suffix = Mage::getStoreConfig('catalog/seo/product_url_suffix', $storeId);
 		if(!empty($suffix)) {
-			if($suffix[0] != '.') {
+			if(($suffix[0] != '.') && ($suffix != '/')) {
 				$suffix = '.' . $suffix;
 			}
 		}
 		return $suffix;
+	}
+	
+	public function getUncachedConfigValue($path, $storeId = 0) 
+	{
+		$collection = Mage::getModel('core/config_data')->getCollection()->addFieldToFilter('path', $path);		
+		if($storeId == 0) {
+			$collection = $collection->addFieldToFilter('scope_id', 0)->addFieldToFilter('scope', 'default');
+		} else {
+			$collection = $collection->addFieldToFilter('scope_id', $storeId)->addFieldToFilter('scope', 'stores');		
+		}
+		return $collection->getFirstItem()->getValue();			
 	}
 }

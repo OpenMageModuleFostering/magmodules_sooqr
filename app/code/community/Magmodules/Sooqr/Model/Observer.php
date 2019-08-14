@@ -21,7 +21,7 @@ class Magmodules_Sooqr_Model_Observer {
     {
         $enabled = Mage::getStoreConfig('sooqr_connect/general/enabled');
     	$cron = Mage::getStoreConfig('sooqr_connect/generate/cron');
-    	$next_store = Mage::getStoreConfig('sooqr_connect/generate/cron_next');
+    	$next_store = Mage::helper('sooqr')->getUncachedConfigValue('sooqr_connect/generate/cron_next');
 		$storeIds = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
 		if($enabled && $cron && (count($storeIds) > 0)) {
 			if(empty($next_store) || ($next_store >= count($storeIds))) { 
@@ -37,7 +37,6 @@ class Magmodules_Sooqr_Model_Observer {
 				$config->saveConfig('sooqr_connect/generate/feed_result', $html, 'stores', $store_id);
 			}	
 			$config->saveConfig('sooqr_connect/generate/cron_next', ($next_store + 1), 'default', 0);
-			Mage::app()->getCacheInstance()->cleanType('config');
 			$appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);			
 		}   	      
     }

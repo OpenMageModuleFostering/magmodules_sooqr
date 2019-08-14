@@ -19,12 +19,13 @@ class Magmodules_Sooqr_Block_Adminhtml_System_Config_Form_Field_Feeds  extends M
 
     public function render(Varien_Data_Form_Element_Abstract $element) 
     {
-		$store_ids = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
+		$helper = Mage::helper('sooqr');
+		$store_ids = $helper->getStoreIds('sooqr_connect/generate/enabled'); 		
 		$html_feedlinks = '';
 		foreach($store_ids as $storeId) {
 			$generate_url = $this->getUrl('*/sooqr/generateFeed/store_id/' . $storeId);
 			$download_url = $this->getUrl('*/sooqr/download/store_id/' . $storeId);
-			$feed_text = Mage::getStoreConfig('sooqr_connect/generate/feed_result', $storeId);
+			$feed_text = $helper->getUncachedConfigValue('sooqr_connect/generate/feed_result', $storeId);
 			if(empty($feed_text)) {
 				$feed_text = Mage::helper('sooqr')->__('No active feed found');	
 				$download_url = '';

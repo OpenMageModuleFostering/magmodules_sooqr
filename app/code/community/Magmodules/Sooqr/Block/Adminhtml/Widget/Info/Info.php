@@ -32,15 +32,16 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
                     <br />
                     <table width="500px" border="0">
 						<tr>
-							<td width="58%">View more extensions from us:</td>
+							<td width="58%">More Extensions from Magmodules:</td>
 							<td width="42%"><a href="http://www.magentocommerce.com/magento-connect/developer/Magmodules" target="_blank">Magento Connect</a></td>
 						</tr>
-							<td>Send us an E-mail:
-							<td><a href="mailto:info@magmodules.eu">info@magmodules.eu</a></td>
+						<tr>
+							<td>For Help:</td>
+							<td><a href="https://www.magmodules.eu/support.html?ext=sooqr">Visit our Support Page</a></td>
 						</tr>
 						<tr>
-							<td height="30">Visit our Website and Knowledgebase:</td>
-							<td><a href="http://www.magmodules.eu/help/sooqr" target="_blank">www.magmodules.eu</a></td>
+							<td height="30">Visit our Website:</td>
+							<td><a href="http://www.magmodules.eu" target="_blank">www.Magmodules.eu</a></td>
 						</tr>';
 			
 						
@@ -60,6 +61,10 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
 		$html .= '		<tr>
 							<td height="30">Sooqr Support</td>
 							<td><a href="http://support.sooqr.com/support/home" target="_blank">Sooqr Support</a> or <a href="mailto:support@sooqr.com" target="_blank">support@sooqr.com</a></td>
+						</tr>
+						<tr>
+							<td height="30"><strong>Read everything about the extension configuration in our <a href="http://www.magmodules.eu/help/shopreview-testimonials#" target="_blank">Knowledgebase.</a></strong></td>
+							<td>&nbsp;</td>
 						</tr>
 					</table>
                 </div>';

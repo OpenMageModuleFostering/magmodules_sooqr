@@ -25,38 +25,46 @@ class Magmodules_Sooqr_Model_Adminhtml_System_Config_Backend_Sooqr_Cron extends 
     {
         $time = $this->getData('groups/generate/fields/time/value');
         $frequency = $this->getData('groups/generate/fields/frequency/value');
-		$store_ids = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
-		$count = count($store_ids);
+		$count = count(Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled')); 		
+        $cronExprString = '';
+		
 		if($count > 0) {
-			$minute[] = 1;
-			$n = floor(60/$count);
-			if($n == 60) { $n = 0; }		
-			for($i = 1; $i < $count; $i++) {		
-				$min = ($i * $n);
-				$minute[] = $min;
-			}
-			$minute = implode(',', $minute);
 			switch($frequency) {		
-				case 0:
-					$cronExprArray = array($minute, intval($time[0]), '*', '*', '*');
+				case 'custom_expr':		 
+					$cronExprString = $this->getData('groups/generate/fields/custom_cron/value');
+					break;	
+				case 0:		
+					$hours = array();
+					for($i = 0; $i < $count; $i++) {					
+						$hours[] = $i;
+					}
+					$cronExprArray = array('40', implode(',', $hours), '*', '*', '*');
 					break;
 				case 6:		 
-					$cronExprArray = array($minute, '*/6', '*', '*', '*');
+					$cronExprArray = array('40', '*/6', '*', '*', '*');
 					break;
 				case 4:		 
-					$cronExprArray = array($minute, '*/4', '*', '*', '*');
+					$cronExprArray = array('40', '*/4', '*', '*', '*');
 					break;
 				case 2:		 
-					$cronExprArray = array($minute, '*/2', '*', '*', '*');
+					$cronExprArray = array('40', '*/2', '*', '*', '*');
 					break;
 				case 1:		 
-					$cronExprArray = array($minute, '*', '*', '*', '*');
+					$cronExprArray = array('40', '*', '*', '*', '*');
+					break;
+				case 30:		 
+					$cronExprArray = array('10,40', '*', '*', '*', '*');
+					break;
+				case 15:		 
+					$cronExprArray = array('0,15,30,45', '*', '*', '*', '*');
 					break;
 			}
-			$cronExprString = join(' ', $cronExprArray);
-		} else {
-	        $cronExprString = '';
 		}
+				
+		if(!empty($cronExprArray)) {
+			$cronExprString = join(' ', $cronExprArray);
+		}
+		
         try {
             Mage::getModel('core/config_data')
             	->load(self::CRON_MODEL_PATH, 'path')
