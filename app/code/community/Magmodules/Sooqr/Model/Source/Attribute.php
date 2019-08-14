@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Magmodules.eu - http://www.magmodules.eu
  *
@@ -17,35 +18,29 @@
  * @copyright     Copyright (c) 2017 (http://www.magmodules.eu)
  * @license       http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
-class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Attribute
+class Magmodules_Sooqr_Model_Source_Attribute
 {
 
-    /**
-     * @return array
-     */
     public function toOptionArray()
     {
+
         $optionArray = array();
-        $optionArray[] = array('value' => '', 'label' => Mage::helper('sooqr')->__('-- none'));
+
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->addVisibleFilter()
+            ->addFieldToFilter(
+                'backend_type',
+                array('text', 'select', 'textarea', 'date', 'int', 'boolean', 'static', 'varchar')
+            );
+
+        // Some Default Attributes
         $optionArray[] = array('label' => Mage::helper('sooqr')->__('- Product ID'), 'value' => 'entity_id');
         $optionArray[] = array('label' => Mage::helper('sooqr')->__('- Final Price'), 'value' => 'final_price');
-        $optionArray[] = array('label' => Mage::helper('sooqr')->__('- Product Type'), 'value' => 'type_id');
-        $backendTypes = array('text', 'select', 'textarea', 'date', 'int', 'boolean', 'static', 'varchar', 'decimal');
-        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')->setOrder(
-            'frontend_label',
-            'ASC'
-        )->addFieldToFilter('backend_type', $backendTypes);
-        foreach ($attributes as $attribute) {
-            if ($attribute->getData('frontend_label')) {
-                $label = str_replace("'", "", $attribute->getData('frontend_label'));
-            } else {
-                $label = str_replace("'", "", $attribute->getData('attribute_code'));
-            }
 
+        foreach ($attributes as $attribute) {
             $optionArray[] = array(
-                'value' => $attribute->getData('attribute_code'),
-                'label' => $label,
+                'label' => str_replace("'", "", $attribute->getData('frontend_label')),
+                'value' => $attribute->getData('attribute_code')
             );
         }
 

@@ -18,16 +18,12 @@
  * @copyright     Copyright (c) 2017 (http://www.magmodules.eu)
  * @license       http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Tax
+class Magmodules_Sooqr_Model_Source_Countries
 {
 
     public function toOptionArray()
     {
-        $position = array();
-        $position[] = array('value' => '', 'label' => Mage::helper('sooqr')->__('No'));
-        $position[] = array('value' => 'incl', 'label' => Mage::helper('sooqr')->__('Force including Tax'));
-        $position[] = array('value' => 'excl', 'label' => Mage::helper('sooqr')->__('Force excluding Tax'));
-        return $position;
+        return Mage::getResourceModel('directory/country_collection')->loadData()->toOptionArray(true);
     }
 
 }

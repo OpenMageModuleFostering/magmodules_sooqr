@@ -18,13 +18,10 @@
  * @license       http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Magmodules_Sooqr_Model_Adminhtml_System_Config_Backend_Design_Extra
+class Magmodules_Sooqr_Model_System_Config_Backend_Design_Extra
     extends Mage_Adminhtml_Model_System_Config_Backend_Serialized_Array
 {
 
-    /**
-     *
-     */
     public function _beforeSave()
     {
         $value = $this->getValue();
@@ -54,13 +51,7 @@ class Magmodules_Sooqr_Model_Adminhtml_System_Config_Backend_Design_Extra
         parent::_beforeSave();
     }
 
-    /**
-     * @param $data
-     * @param $sort
-     *
-     * @return mixed
-     */
-    public function orderData($data, $sort)
+    function orderData($data, $sort)
     {
         $code = "return strnatcmp(\$a['$sort'], \$b['$sort']);";
         usort($data, create_function('$a,$b', $code));
