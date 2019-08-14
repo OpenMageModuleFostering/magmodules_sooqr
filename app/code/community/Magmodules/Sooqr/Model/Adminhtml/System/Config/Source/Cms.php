@@ -15,15 +15,15 @@
  * =============================================================
  */
  
-class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Image {
+class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Cms {
 
 	public function toOptionArray() 
 	{
-		$position = array();
-		$position[] = array('value'=> '', 'label'=> Mage::helper('sooqr')->__('No'));
-		$position[] = array('value'=> 'incl', 'label'=> Mage::helper('sooqr')->__('Force including Tax'));	
-		$position[] = array('value'=> 'excl', 'label'=> Mage::helper('sooqr')->__('Force excluding Tax'));	
-		return $position;
+		$cms = array();
+		$cms[] = array('value'=> '0', 'label'=> Mage::helper('sooqr')->__('No'));
+		$cms[] = array('value'=> '1', 'label'=> Mage::helper('sooqr')->__('Yes, all'));	
+		$cms[] = array('value'=> '2', 'label'=> Mage::helper('sooqr')->__('Yes, selection'));	
+		return $cms;
 	}
 	
 }

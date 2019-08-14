@@ -81,7 +81,11 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$config['filter_cat']			= Mage::getStoreConfig('sooqr_connect/products/categories', $storeId);		
 		$config['filter_type']			= Mage::getStoreConfig('sooqr_connect/products/category_type', $storeId);
 		$config['cms_pages']			= Mage::getStoreConfig('sooqr_connect/products/cms_pages', $storeId);
+		$config['cms_include']			= Mage::getStoreConfig('sooqr_connect/products/cms_include', $storeId);
 		$config['filters']				= @unserialize(Mage::getStoreConfig('sooqr_connect/products/advanced', $storeId));	
+		$config['product_url_suffix']   = $feed->getProductUrlSuffix($storeId);
+		$config['stock_manage']			= Mage::getStoreConfig('cataloginventory/item_options/manage_stock');
+		$config['backorders']			= Mage::getStoreConfig('cataloginventory/item_options/backorders');
 
 		// PRICE
 		$config['price_scope']			= Mage::getStoreConfig('catalog/price/scope');
@@ -241,7 +245,25 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		}
 		return $assoc_id;		
 	}
-		
+
+	protected function getStockData($product_data, $config, $product) 
+	{				
+		$stock_data = array();
+		if($product->getUseConfigManageStock()) {
+			$stock_data['manage_stock'] = (string)$config['stock_manage'];
+		} else {
+			$stock_data['manage_stock'] = (string)$product->getManageStock();			
+		}
+
+		if($product->getUseConfigBackorders()) {
+			$stock_data['backorders'] = (string)$config['backorders'];
+		} else {
+			$stock_data['backorders'] = (string)$product->getBackorders();			
+		}
+		return $stock_data;		
+	}
+	
+	
 	protected function getCategoryData($product_data, $config) 
 	{			
 		$category = array(); 
@@ -278,6 +300,10 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		if($_assoc_id = $this->getAssocId($product_data)) {
 			$_extra = array_merge($_extra, $_assoc_id);
 		}			
+		if($_stock_data = $this->getStockData($product_data, $config, $product)) {
+			$_extra = array_merge($_extra, $_stock_data);
+		}			
+
 		return $_extra;
 	}	
 
@@ -330,7 +356,12 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 	public function getCmspages($config) 
 	{
 		$cmspages = array();
-		$pages = Mage::getModel('cms/page')->getCollection()->addStoreFilter($config['store_id'])->addFieldToFilter('is_active', 1)->addFieldToFilter('identifier',array(array('nin'=>array('no-route','enable-cookies'))));
+		if($config['cms_pages'] == 1) {
+			$pages = Mage::getModel('cms/page')->getCollection()->addStoreFilter($config['store_id'])->addFieldToFilter('is_active', 1)->addFieldToFilter('identifier', array(array('nin' => array('no-route','enable-cookies'))));
+		} else {
+			$cms_include = explode(',', $config['cms_include']);
+			$pages = Mage::getModel('cms/page')->getCollection()->addStoreFilter($config['store_id'])->addFieldToFilter('is_active', 1)->addFieldToFilter('page_id', array('in' => $cms_include));		
+		}
 		foreach($pages as $page) {
 			$cmspages[] = array('content_type' => 'cms', 'id' => 'CMS-' . $page->getId(), 'title' => $page->getTitle(), 'content' => Mage::helper('sooqr')->cleanData($page->getContent(), 'striptags'), 'url' => $config['website_url'] . $page->getIdentifier());
 		}

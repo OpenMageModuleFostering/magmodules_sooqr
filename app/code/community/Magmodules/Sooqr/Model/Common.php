@@ -117,8 +117,8 @@ class Magmodules_Sooqr_Model_Common extends Mage_Core_Helper_Abstract {
 				}				
 			}
 		}
-		
-		$collection->joinTable('cataloginventory/stock_item', 'product_id=entity_id', array("qty" => "qty", "stock_status" => "is_in_stock", "manage_stock" => "manage_stock", "use_config_manage_stock" => "use_config_manage_stock"))->addAttributeToSelect(array('qty', 'stock_status', 'manage_stock', 'use_config_manage_stock'));		
+
+		$collection->joinTable('cataloginventory/stock_item', 'product_id=entity_id', array("qty" => "qty", "stock_status" => "is_in_stock", "manage_stock" => "manage_stock", "use_config_manage_stock" => "use_config_manage_stock", "use_config_backorders" => "use_config_backorders", "backorders" => "backorders"))->addAttributeToSelect(array('qty', 'stock_status', 'manage_stock', 'use_config_manage_stock', 'use_config_backorders', 'backorders'));		
 		$collection->getSelect()->group('e.entity_id');               
         return $collection->load();
     }	
