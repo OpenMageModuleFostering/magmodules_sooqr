@@ -63,7 +63,7 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
 							<td><a href="http://support.sooqr.com/support/home" target="_blank">Sooqr Support</a> or <a href="mailto:support@sooqr.com" target="_blank">support@sooqr.com</a></td>
 						</tr>
 						<tr>
-							<td height="30"><strong>Read everything about the extension configuration in our <a href="http://www.magmodules.eu/help/shopreview-testimonials#" target="_blank">Knowledgebase.</a></strong></td>
+							<td height="30"><strong>Read everything about the extension configuration in our <a href="http://www.magmodules.eu/help/sooqr" target="_blank">Knowledgebase.</a></strong></td>
 							<td>&nbsp;</td>
 						</tr>
 					</table>

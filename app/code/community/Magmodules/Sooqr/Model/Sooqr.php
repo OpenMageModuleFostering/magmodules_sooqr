@@ -86,6 +86,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$config['product_url_suffix']   = $feed->getProductUrlSuffix($storeId);
 		$config['stock_manage']			= Mage::getStoreConfig('cataloginventory/item_options/manage_stock');
 		$config['backorders']			= Mage::getStoreConfig('cataloginventory/item_options/backorders');
+		$config['token']				= Mage::getStoreConfig('sooqr_connect/generate/token');
 
 		// PRICE
 		$config['price_scope']			= Mage::getStoreConfig('catalog/price/scope');
@@ -323,6 +324,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$header['extension_version'] = $config['version'];
 		$header['store'] = $config['website_name'];
 		$header['url'] = $config['website_url'];
+		$header['token'] = $config['token'];
 		$header['products_total'] = $count;
 		$header['products_limit'] = $config['limit'];
 		$header['date_created'] = Mage::getModel('core/date')->date('Y-m-d H:i:s');

@@ -674,7 +674,12 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getTypePrices($config, $products) 
 	{
 		$type_prices = array();
-		if(!empty($config['conf_enabled'])) {	
+		if(!empty($config['conf_enabled'])) {
+			if(!empty($config['hide_currency'])) {
+				$currency = '';
+			} else {
+				$currency = ' ' . $config['currency'];
+			}			
 			foreach($products as $product) {
 				if($product->getTypeId() == 'configurable') {
 					$attributes = $product->getTypeInstance(true)->getConfigurableAttributes($product);
@@ -682,15 +687,20 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 					$base_price = $product->getFinalPrice();
 					$base_price_reg = $product->getPrice();
 					foreach ($attributes as $attribute){
+			            $optionPrices = array();
 						$prices = $attribute->getPrices();
-						foreach ($prices as $price){
-							if ($price['is_percent']) { 
-								$att_prices[$price['value_index']] = (float)(($price['pricing_value'] * $base_price / 100) * $config['markup']);
-								$att_prices[$price['value_index'] . '_reg'] = (float)(($price['pricing_value'] * $base_price_reg / 100) * $config['markup']);
-							} else {
-								$att_prices[$price['value_index']] = (float)($price['pricing_value'] * $config['markup']);
-								$att_prices[$price['value_index'] . '_reg'] = (float)($price['pricing_value'] * $config['markup']);
-							}
+		                foreach ($prices as $value) {
+							$product->setConfigurablePrice(
+								$this->_preparePrice($value['pricing_value'], $value['is_percent'], $product)
+							);
+							$product->setParentId(true);
+							Mage::dispatchEvent(
+								'catalog_product_type_configurable_price',
+								array('product' => $product)
+							);
+							$configurablePrice = $product->getConfigurablePrice();
+		                    $optionPrices[$value['value_index']] = $configurablePrice;
+		                    $optionPrices[$value['value_index'] .'_reg'] = $this->_prepareOldPrice($value['pricing_value'], $value['is_percent'], $product);
 						}
 					}
 					$simple = $product->getTypeInstance()->getUsedProducts();
@@ -700,9 +710,9 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 						$total_price_reg = $base_price_reg;
 						foreach($attributes as $attribute) {
 							$value = $sProduct->getData($attribute->getProductAttribute()->getAttributeCode());
-							if(isset($att_prices[$value])) {
-								$total_price += $att_prices[$value];
-								$total_price_reg += $att_prices[$value . '_reg'];
+							if(isset($optionPrices[$value])) {
+								$total_price += $optionPrices[$value];
+								$total_price_reg += $optionPrices[$value . '_reg'];
 							}
 						}
 						$type_prices[$sProduct->getEntityId()] = number_format(($total_price * $config['markup']), 2, '.', '');
@@ -713,6 +723,24 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 		}
 		return $type_prices;
 	}
+
+    protected function _preparePrice($price, $isPercent = false, $product)
+    {
+        if ($isPercent && !empty($price)) {
+            $price = $product->getFinalPrice() * $price / 100;
+        }
+
+        return $price;
+    }
+    
+    protected function _prepareOldPrice($price, $isPercent = false, $product)
+    {
+        if ($isPercent && !empty($price)) {
+            $price = $product->getPrice() * $price / 100;
+        }
+
+        return $price;
+    }
 	
 	public function checkOldVersion($dir) 
 	{

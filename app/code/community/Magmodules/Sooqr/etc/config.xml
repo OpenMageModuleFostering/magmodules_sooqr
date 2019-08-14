@@ -19,7 +19,7 @@
 <config>
 	<modules>
 		<Magmodules_Sooqr>
-			<version>1.1.8</version>
+			<version>1.1.9</version>
 		</Magmodules_Sooqr>
 	</modules>
 	<global>
@@ -38,6 +38,16 @@
 				<class>Magmodules_Sooqr_Model</class>
 			</sooqr>
 		</models>
+        <resources>
+            <magmodules_sooqr_setup>
+                <setup>
+                    <module>Magmodules_Sooqr</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </magmodules_sooqr_setup>
+        </resources>			
 	</global>
 	<frontend>
 		<routers>
