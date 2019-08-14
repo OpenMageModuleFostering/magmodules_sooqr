@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Magmodules.eu - http://www.magmodules.eu - info@magmodules.eu
+ * =============================================================
+ * NOTICE OF LICENSE [Single domain license]
+ * This source file is subject to the EULA that is
+ * available through the world-wide-web at:
+ * http://www.magmodules.eu/license-agreement/
+ * =============================================================
+ * @category    Magmodules
+ * @package     Magmodules_Sooqr
+ * @author      Magmodules <info@magmodules.eu>
+ * @copyright   Copyright (c) 2016 (http://www.magmodules.eu)
+ * @license     http://www.magmodules.eu/license-agreement/  
+ * =============================================================
+ */
+ -->
+<config>
+	<modules>
+		<Magmodules_Sooqr>
+			<version>1.1.0</version>
+		</Magmodules_Sooqr>
+	</modules>
+	<global>
+		<helpers>
+			<sooqr>
+				<class>Magmodules_Sooqr_Helper</class>
+			</sooqr>
+		</helpers>
+		<blocks>
+			<sooqr>
+				<class>Magmodules_Sooqr_Block</class>
+			</sooqr>
+		</blocks>	
+		<models>
+			<sooqr>
+				<class>Magmodules_Sooqr_Model</class>
+			</sooqr>
+		</models>
+	</global>
+	<frontend>
+		<routers>
+			<sooqr>
+				<use>standard</use>
+				<args>
+					<module>Magmodules_Sooqr</module>
+					<frontName>sooqr</frontName>
+				</args>
+			</sooqr>
+		</routers>
+        <layout>
+            <updates>
+                <sooqr>
+                    <file>magmodules_sooqr.xml</file>
+                </sooqr>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Magmodules_Sooq>
+                    <files>
+                        <default>Magmodules_Sooqr.csv</default>
+                    </files>
+                </Magmodules_Sooq>
+            </modules>
+        </translate>
+        <product>
+            <collection>
+                <attributes>
+                    <image />
+               </attributes>
+            </collection>
+        </product>
+	</frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <magmodules_sooqr after="Mage_Adminhtml">Magmodules_Sooqr_Adminhtml</magmodules_sooqr>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+	<adminhtml>
+        <translate>
+            <modules>
+                <magmodules_sooqr>
+                    <files>
+                        <default>Magmodules_Sooqr.csv</default>
+                    </files>
+                </magmodules_sooqr>
+            </modules>
+        </translate>      
+    </adminhtml>
+	<default>
+		<sooqr_connect>
+			<general>
+				<enabled>0</enabled>
+				<frontend_version>4</frontend_version>
+			</general>
+			<products>
+				<id_attribute>id</id_attribute>
+				<name_attribute>name</name_attribute>
+				<sku_attribute>sku</sku_attribute>
+				<description_attribute>description</description_attribute>
+				<brand_attribute>manufacturer</brand_attribute>
+				<image_source>small_image</image_source>
+			</products>
+			<generate>
+				<enabled>1</enabled>
+				<filename>sooqr-datafeed.xml</filename>				
+				<cron>0</cron>								
+				<limit>10</limit>
+				<cron_schedule>0 0 * * *</cron_schedule>
+				<memory_limit>1024M</memory_limit>
+				<max_execution_time>300</max_execution_time>
+				<overwrite>0</overwrite>							
+			</generate>
+		</sooqr_connect>
+	</default>
+	<crontab>
+        <jobs>
+			<sooqr_generate>
+                <schedule><config_path>sooqr/generate/cron_schedule</config_path></schedule>
+                <run><model>sooqr/observer::scheduledGenerateSooqr</model></run>
+			</sooqr_generate>
+        </jobs>
+    </crontab>
+</config>
