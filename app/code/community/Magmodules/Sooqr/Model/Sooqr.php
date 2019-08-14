@@ -54,10 +54,6 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 				$return_feed['products'] = $feed['products'];					
 			}
 			return $return_feed;
-		} else {
-			$return_feed = array();
-			$return_feed['config'] = $this->getFeedHeader($config, count($feed['products']), $time_start);
-			return $return_feed;	
 		}
 	}
 	
@@ -165,11 +161,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
         	mkdir(Mage::getBaseDir('media') . DS . $type);
         }
         
-        $fileName = Mage::getBaseDir() . DS . 'media' . DS . $type . DS . $fileName;
-		if(file_exists($fileName) && ($refresh)) {
-            unlink($fileName);
-        }
-        return $fileName;
+        return Mage::getBaseDir() . DS . 'media' . DS . $type . DS . $fileName;
     }
 
     public function saveFeed($feed, $config, $type, $count) 

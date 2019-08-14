@@ -68,6 +68,13 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
 					</table>
                 </div>';
 
+		$flat_product = Mage::getStoreConfig('catalog/frontend/flat_catalog_product');
+		$flat_category = Mage::getStoreConfig('catalog/frontend/flat_catalog_category');
+		if((!$flat_product) || (!$flat_category)) {
+			$msg = '<div id="messages"><ul class="messages"><li class="error-msg"><ul><li><span>' . Mage::helper('sooqr')->__('Please enable "Flat Catalog Category" and "Flat Catalog Product" for the extension to work properly. <a href="https://www.magmodules.eu/help/enable-flat-catalog/" target="_blank">More information.</a>') . '</span></li></ul></li></ul></div>';
+			$html = $html . $msg;
+		}
+		
 		if(Mage::getStoreConfig('catalog/frontend/flat_catalog_product')) {
 			$store_id =  Mage::helper('sooqr')->getStoreIdConfig();
 			$non_flat_attributes = Mage::helper('sooqr')->checkFlatCatalog(Mage::getModel("sooqr/sooqr")->getFeedAttributes($store_id, 'flatcheck')); 

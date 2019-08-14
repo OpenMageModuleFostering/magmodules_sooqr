@@ -28,17 +28,13 @@ class Magmodules_Sooqr_Model_Adminhtml_System_Config_Backend_Sooqr_Cron extends 
 		$store_ids = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
 		$count = count($store_ids);
 		if($count > 0) {
-			$minute[0] = 0;
+			$minute[] = 1;
 			$n = floor(60/$count);
 			if($n == 60) { $n = 0; }		
 			for($i = 1; $i < $count; $i++) {		
-				$min = ($minute[0] + ($i * $n));
-				if($min >= 60) {
-					$min = ($minute[0] - ($i * $n));
-				}
+				$min = ($i * $n);
 				$minute[] = $min;
 			}
-			asort($minute);
 			$minute = implode(',', $minute);
 			switch($frequency) {		
 				case 0:

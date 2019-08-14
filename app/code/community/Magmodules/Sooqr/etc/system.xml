@@ -607,6 +607,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends><frequency>0</frequency></depends>
+							<tooltip>When using multiple feeds, the cron will run several times during this hour. For example when set to 12:00 with  3 feeds it will run at 12:00, 12:20, 12:40</tooltip>
                         </time>
 						<feeds_heading translate="label">
                             <label>Generated Feeds</label>
