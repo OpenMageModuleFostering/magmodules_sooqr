@@ -24,6 +24,7 @@ class Magmodules_Sooqr_Model_Common extends Mage_Core_Helper_Abstract {
         $collection->setStore($store_id);
         $collection->addStoreFilter($store_id);
         $collection->addFinalPrice();
+		$collection->addUrlRewrite();
 
 		if(!empty($config['filter_enabled'])) {			
 			$type = $config['filter_type'];
@@ -54,7 +55,7 @@ class Magmodules_Sooqr_Model_Common extends Mage_Core_Helper_Abstract {
 
 		// All attributes
         $attributes = array(); 
-        $attributes[] = 'url_path';
+		$attributes[] = 'url_key';       
         $attributes[] = 'price';
         $attributes[] = 'final_price';
         $attributes[] = 'price_model';

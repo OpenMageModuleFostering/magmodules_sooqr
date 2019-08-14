@@ -31,18 +31,7 @@
                                 </children>
                             </config>
                         </children>
-                    </system>
-					<sooqr module="sooqr">
-						<title>Sooqr</title>
-						<sort_order>200</sort_order>
-						<children>
-							<sooqr module="sooqr">
-								<title>Sooqr Manual Feed Generation</title>
-								<sort_order>100</sort_order>
-								<action>adminhtml/sooqr/</action>
-							</sooqr>
-						</children>
-					</sooqr>                    
+                    </system>                  
                 </children>
             </admin>
         </resources>

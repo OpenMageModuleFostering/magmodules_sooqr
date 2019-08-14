@@ -69,7 +69,14 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 				$value = $this->getProductUrl($product, $config, $parent);
 				break;
 			case 'image_link':
-				$value = $this->getProductImage($product_data, $config);
+				if(!empty($parent)) {
+					$value = $this->getProductImage($product, $config);
+					if(empty($value)) {
+						$value = $this->getProductImage($parent, $config);
+					}					
+				} else {
+					$value = $this->getProductImage($product_data, $config);				
+				}										
 				break;
 			case 'condition':
 				$value = $this->getProductCondition($product_data, $config);
@@ -167,23 +174,20 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getProductUrl($product, $config, $parent) 
 	{
 		if(!empty($parent)) {
-			if($parent->getUrlPath()) {
-				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $parent->getUrlPath()));
-			} else {
-				$url = Mage::getModel('catalog/product')->setStoreId($config['store_id'])->load($parent->getId())->getProductUrl();
-				$url = preg_replace('/\?.*/', '', $url);
+			if($parent->getUrlKey()) {
+				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $parent->getUrlKey()));
 			}
+			if($product->getRequestPath()) {
+				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $parent->getRequestPath()));			
+			}			
 		} else {
-			if($product->getUrlPath()) {
-				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $product->getUrlPath()));
-			} else {
-				$url = Mage::getModel('catalog/product')->setStoreId($config['store_id'])->load($product->getId())->getProductUrl();
-				$url = preg_replace('/\?.*/', '', $url);
-			}		
+			if($product->getUrlKey()) {
+				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $product->getUrlKey()));
+			}
+			if($product->getRequestPath()) {
+				$url = Mage::helper('core')->escapeHtml(trim($config['website_url'] . $product->getRequestPath()));			
+			}			
 		}
-		if(!empty($config['url_suffix'])) {
-			$url = $url . '?' . $config['url_suffix'];
-		}	
 		if(!empty($parent) && !empty($config['conf_switch_urls'])) {
 			if($parent->getTypeId() == 'configurable') {
 				$productAttributeOptions = $parent->getTypeInstance(true)->getConfigurableAttributesAsArray($parent);
@@ -206,12 +210,14 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 		$image_data = array();
 		if(!empty($config['image_resize']) && !empty($config['image_size'])) { 
 			$image_file = $product->getData($config['image_source']);
-			$imageModel = Mage::getModel('catalog/product_image')->setSize($config['image_size'])->setDestinationSubdir($config['image_source'])->setBaseFile($image_file);
-			if(!$imageModel->isCached()) {
-				$imageModel->resize()->saveFile();
-			}
-			$productImage = $imageModel->getUrl();
-			return (string)$productImage;
+			if($image_file != 'no_selection') {
+				$imageModel = Mage::getModel('catalog/product_image')->setSize($config['image_size'])->setDestinationSubdir($config['image_source'])->setBaseFile($image_file);
+				if(!$imageModel->isCached()) {
+					$imageModel->resize()->saveFile();
+				}
+				$productImage = $imageModel->getUrl();
+				return (string)$productImage;
+			} 	
 		} else {		
 			$image = '';		
 			if(!empty($config['media_attributes'])) {
@@ -612,15 +618,18 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 			foreach ($options as $option) {
 			  $selection = $option->getDefaultSelection();
 			  if($selection === null) { continue; }
-				$prod_option = Mage::getModel('catalog/product')->setStoreId($storeId)->load($selection->getProductId()); 
-				$price += ($prod_option->getFinalPrice() * $selection->getSelectionQty()); 
+				$selection_product_id = $selection->getProductId(); 
+				$_resource = Mage::getSingleton('catalog/product')->getResource();
+				$final_price = $_resource->getAttributeRawValue($selection_product_id, 'final_price', $storeId);
+				$selection_qty = $_resource->getAttributeRawValue($selection_product_id, 'selection_qty', $storeId);
+				$price += ($final_price * $selection_qty); 
 			}				
 		}
 		if($price < 0.01) {
 			$price = Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), true);			
 		}
 		return $price; 				
-	}			
+	}		
 
 	public function getPriceGrouped($product, $pricemodel = '') 
 	{		
@@ -638,6 +647,43 @@ class Magmodules_Sooqr_Helper_Data extends Mage_Core_Helper_Abstract {
 			if($pricemodel == 'max') { return max($prices); }	
 			if($pricemodel == 'total') { return array_sum($prices); }	
 		}
+	}
+
+	public function getTypePrices($config, $products) 
+	{
+		$type_prices = array();
+		if(!empty($config['conf_enabled'])) {
+			foreach($products as $product) {
+				if($product->getTypeId() == 'configurable') {
+					$attributes = $product->getTypeInstance(true)->getConfigurableAttributes($product);
+					$att_prices = array();
+					$base_price = $product->getFinalPrice();
+					foreach ($attributes as $attribute){
+						$prices = $attribute->getPrices();
+						foreach ($prices as $price){
+							if ($price['is_percent']) { 
+								$att_prices[$price['value_index']] = (float)$price['pricing_value'] * $base_price / 100;
+							} else {
+								$att_prices[$price['value_index']] = (float)$price['pricing_value'];
+							}
+						}
+					}
+					$simple = $product->getTypeInstance()->getUsedProducts();
+					$simple_prices = array();	
+					foreach($simple as $sProduct) {
+						$total_price = $base_price;
+						foreach($attributes as $attribute) {
+							$value = $sProduct->getData($attribute->getProductAttribute()->getAttributeCode());
+							if(isset($att_prices[$value])) {
+								$total_price += $att_prices[$value];
+							}
+						}
+						$type_prices[$sProduct->getEntityId()] = number_format($total_price, 2, '.', '') . ' ' . $config['currency'];
+					}
+				}
+			}
+		}
+		return $type_prices;
 	}
 
 	public function checkOldVersion($dir) 

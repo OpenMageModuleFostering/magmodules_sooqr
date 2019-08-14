@@ -15,11 +15,15 @@
  * =============================================================
  */
  
-class Magmodules_Sooqr_Block_Adminhtml_System_Config_Form_Field_Version extends Mage_Adminhtml_Block_System_Config_Form_Field {
+class Magmodules_Sooqr_Model_Adminhtml_System_Config_Source_Image {
 
-    public function _getElementHtml(Varien_Data_Form_Element_Abstract $element) 
-    {
-		return Mage::getConfig()->getNode()->modules->Magmodules_Sooqr->version;
-    }
-    
+	public function toOptionArray() 
+	{
+		$position = array();
+		$position[] = array('value'=> '', 'label'=> Mage::helper('sooqr')->__('No'));
+		$position[] = array('value'=> 'incl', 'label'=> Mage::helper('sooqr')->__('Force including Tax'));	
+		$position[] = array('value'=> 'excl', 'label'=> Mage::helper('sooqr')->__('Force excluding Tax'));	
+		return $position;
+	}
+	
 }

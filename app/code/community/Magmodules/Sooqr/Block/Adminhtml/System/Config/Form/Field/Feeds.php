@@ -19,7 +19,7 @@ class Magmodules_Sooqr_Block_Adminhtml_System_Config_Form_Field_Feeds  extends M
 
     public function render(Varien_Data_Form_Element_Abstract $element) 
     {
-		$store_ids = Mage::helper('sooqr')->getStoreIds('sooqr/generate/enabled'); 		
+		$store_ids = Mage::helper('sooqr')->getStoreIds('sooqr_connect/generate/enabled'); 		
 		$html_feedlinks = '';
 		foreach($store_ids as $storeId) {
 			$generate_url = $this->getUrl('*/sooqr/generateFeed/store_id/' . $storeId);

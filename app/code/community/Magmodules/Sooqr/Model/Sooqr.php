@@ -22,12 +22,13 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
         $limit = $this->setMemoryLimit($store_id);
         $config = $this->getFeedConfig($store_id);	
 		$products = $this->getProducts($config, $config['limit']);	
-		if($feed = $this->getFeedData($products, $config, $time_start)) {
+		$prices = Mage::helper('sooqr')->getTypePrices($config, $products);
+		if($feed = $this->getFeedData($products, $config, $time_start, $prices)) {
 			return $this->saveFeed($feed, $config, 'sooqr', count($feed['products']));
 		}	
 	}
 
-	public function getFeedData($products, $config, $time_start) 
+	public function getFeedData($products, $config, $time_start, $prices) 
 	{		
 		foreach($products as $product) {
 			$parent_id = Mage::helper('sooqr')->getParentData($product, $config);
@@ -37,7 +38,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 				foreach($product_data as $key => $value) {
 					if((!is_array($value)) && (!empty($value) || is_numeric($value))) { $product_row[$key] = $value; }	
 				}
-				if($extra_data = $this->getExtraDataFields($product_data, $config, $product)) {
+				if($extra_data = $this->getExtraDataFields($product_data, $config, $product, $prices)) {
 					$product_row = array_merge($product_row, $extra_data);
 				}
 				$feed['products'][] = $product_row;				
@@ -60,7 +61,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		}
 	}
 	
-	public function getFeedConfig($storeId) 
+	public function getFeedConfig($storeId, $type = 'xml')
 	{
 		
 		$config							= array();
@@ -103,7 +104,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$config['use_tax']				= $feed->getTaxUsage($config);
 		
 		// FIELD & CATEGORY DATA
-		$config['field']				= $this->getFeedAttributes($storeId, $config);
+		$config['field']				= $this->getFeedAttributes($storeId, $type, $config);
 		$config['category_data']		= $feed->getCategoryData($config, $storeId);
 		
 		if($config['image_resize'] == 'fixed') {
@@ -115,7 +116,7 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		return $config;	
 	}
 
-	public function getFeedAttributes($storeId = 0, $config = '') 
+	public function getFeedAttributes($storeId = 0, $type = 'xml', $config = '')
 	{
 		$attributes = array();
 		$attributes['id']			= array('label' => 'id', 'source' => Mage::getStoreConfig('sooqr_connect/products/id_attribute', $storeId));
@@ -133,13 +134,18 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		$attributes['visibility']	= array('label' => 'visibility', 'source' => 'visibility');
 		$attributes['status']		= array('label' => 'status', 'source' => 'status');
 		$attributes['categories']	= array('label' => 'categories', 'source' => '', 'parent' => 1);				
-
 		if($extra_fields = @unserialize(Mage::getStoreConfig('sooqr_connect/products/extra', $storeId))) {
 			foreach($extra_fields as $extra_field) {
 				$attributes[$extra_field['attribute']] = array('label' => $extra_field['attribute'], 'source' => $extra_field['attribute'], 'action' => 'striptags');		
 			}
 		}
-
+		if($type == 'flatcheck') {
+			if($filters = @unserialize(Mage::getStoreConfig('sooqr_connect/products/advanced', $storeId))) {
+				foreach($filters as $filter) {
+					$attributes[$filter['attribute']] = array('label' => $filter['attribute'], 'source' => $filter['attribute']);
+				}
+			}
+		}
 		return Mage::helper('sooqr')->addAttributeData($attributes, $config);	
 	}
 	
@@ -193,28 +199,40 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
         }
 	}  
 	   
-	protected function getPrices($data, $currency, $config) 
+	protected function getPrices($data, $currency, $config, $conf_prices, $id) 
 	{			
 		$prices = array();
 		$prices['currency'] = $currency;
-
-		foreach($config['currency_data'] as $key => $value) {		
-			if($currency == $key) {
+		if(!empty($conf_prices[$id])) {
+			$prices['price'] = $conf_prices[$id];	
+		} else {
+			if(!empty($config['currency_data'])) {
+				foreach($config['currency_data'] as $key => $value) {		
+					if($currency == $key) {
+						if(isset($data['sales_price'])) {
+							$prices['normal_price'] = $data['regular_price'];
+							$prices['price'] = $data['sales_price'];
+						} else {
+							$prices['price'] = $data['price'];
+						}
+					} else {
+						if(isset($data['sales_price'])) {
+							$prices['normal_price_' . strtolower($key)] = round(($data['regular_price'] * $value), 2);
+							$prices['price_' . strtolower($key)] = round(($data['sales_price'] * $value), 2);
+						} else {
+							$prices['price_' . strtolower($key)] = round(($data['price'] * $value), 2);
+						}			
+					}
+				}	
+			} else {
 				if(isset($data['sales_price'])) {
 					$prices['normal_price'] = $data['regular_price'];
 					$prices['price'] = $data['sales_price'];
 				} else {
 					$prices['price'] = $data['price'];
-				}
-			} else {
-				if(isset($data['sales_price'])) {
-					$prices['normal_price_' . strtolower($key)] = round(($data['regular_price'] * $value), 2);
-					$prices['price_' . strtolower($key)] = round(($data['sales_price'] * $value), 2);
-				} else {
-					$prices['price_' . strtolower($key)] = round(($data['price'] * $value), 2);
-				}			
-			}
-		}	
+				} 		
+			}		
+		}
 		return $prices;
 	}
 
@@ -251,13 +269,13 @@ class Magmodules_Sooqr_Model_Sooqr extends Magmodules_Sooqr_Model_Common {
 		return $category_array;		
 	}
 			
-	protected function getExtraDataFields($product_data, $config, $product) 
+	protected function getExtraDataFields($product_data, $config, $product, $prices) 
 	{
 		$_extra = array();
 		if($_category_data = $this->getCategoryData($product_data, $config)) {
 			$_extra = array_merge($_extra, $_category_data);
 		}
-		if($_prices = $this->getPrices($product_data['price'], $config['currency'], $config)) {
+		if($_prices = $this->getPrices($product_data['price'], $config['currency'], $config, $prices, $product->getEntityId())) {
 			$_extra = array_merge($_extra, $_prices);
 		}
 		if($_assoc_id = $this->getAssocId($product_data)) {

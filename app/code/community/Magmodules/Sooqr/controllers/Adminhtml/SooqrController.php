@@ -19,7 +19,7 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 
 	public function generateFeedAction($store_id = '') 
 	{	
-		if(Mage::getStoreConfig('sooqr/general/enabled')) {
+		if(Mage::getStoreConfig('sooqr_connect/general/enabled')) {
 			$store_id = $this->getRequest()->getParam('store_id');
 			if(!empty($store_id)) {
 				$time_start = microtime(true);
@@ -82,7 +82,7 @@ class Magmodules_Sooqr_Adminhtml_SooqrController extends Mage_Adminhtml_Controll
 
 	protected function _isAllowed() 
 	{
-        return Mage::getSingleton('admin/session')->isAllowed('admin/sooqr_connect/sooqr');
+        return Mage::getSingleton('admin/session')->isAllowed('admin/system/config/sooqr_connect');
     }   
         
 }

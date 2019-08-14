@@ -19,7 +19,7 @@
 <config>
 	<modules>
 		<Magmodules_Sooqr>
-			<version>1.1.0</version>
+			<version>1.1.4</version>
 		</Magmodules_Sooqr>
 	</modules>
 	<global>

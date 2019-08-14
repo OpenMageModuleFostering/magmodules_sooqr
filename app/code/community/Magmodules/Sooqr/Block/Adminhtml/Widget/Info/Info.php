@@ -21,7 +21,12 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
     {
 		$account_id = Mage::getStoreConfig('sooqr_connect/general/account_id');
 		$api_key = Mage::getStoreConfig('sooqr_connect/general/api_key');
-		$html = '<div style="background:url(\'http://www.magmodules.eu/_logo.png\') no-repeat scroll 15px center #EAF0EE;border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 200px;">
+        $magento_version = Mage::getVersion();
+        $module_version = Mage::getConfig()->getNode()->modules->Magmodules_Sooqr->version;
+		$logo_link = '//www.magmodules.eu/logo/sooqr/' . $module_version . '/' . $magento_version . '/logo.png';
+		$base_url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+
+		$html = '<div style="background:url(\'' . $logo_link . '\') no-repeat scroll 15px center #EAF0EE;border:1px solid #CCCCCC;margin-bottom:10px;padding:10px 5px 5px 200px;">
 					<h4>About Magmodules.eu</h4>
 					<p>We are a Magento only E-commerce Agency located in the Netherlands and we developed this extension in association with Sooqr.<br>
                     <br />
@@ -42,9 +47,11 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
 		if(empty($account_id) && empty($api_key)) {					
 			$html .= '	<tr>
 							<td>Registration on Sooqr (and free trial):</td>
-							<td><a href="https://my.sooqr.com/magtrial" target="_blank">Register here</a></td>
-						</tr>
-                        <tr>
+							<td><a href="https://my.sooqr.com/magtrial?base=' . $base_url . '" target="_blank">Register here</a></td>
+						</tr>';
+
+		} else {
+			$html .= '  <tr>
 							<td>Sooqr Conversion Suite</td>
 							<td><a href="https://my.sooqr.com/user/login" target="_blank">Login here</a></td>
 						</tr>';
@@ -63,7 +70,7 @@ class Magmodules_Sooqr_Block_Adminhtml_Widget_Info_Info extends Mage_Adminhtml_B
 
 		if(Mage::getStoreConfig('catalog/frontend/flat_catalog_product')) {
 			$store_id =  Mage::helper('sooqr')->getStoreIdConfig();
-			$non_flat_attributes = Mage::helper('sooqr')->checkFlatCatalog(Mage::getModel("sooqr/sooqr")->getFeedAttributes($store_id)); 
+			$non_flat_attributes = Mage::helper('sooqr')->checkFlatCatalog(Mage::getModel("sooqr/sooqr")->getFeedAttributes($store_id, 'flatcheck')); 
 			if(count($non_flat_attributes) > 0) {
 				$html .= '<div id="messages"><ul class="messages"><li class="error-msg"><ul><li><span>';
 				$html .= $this->__('Warning: The following used attribute(s) were not found in the flat catalog: %s. This can result in empty data or higher resource usage. Click <a href="%s">here</a> to add these to the flat catalog. ', implode($non_flat_attributes, ', '), $this->getUrl('*/sooqr/addToFlat'));
